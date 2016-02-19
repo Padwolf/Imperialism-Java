@@ -47,11 +47,8 @@ public class Frame extends JFrame {
 
         panel = new Panel();
         add(panel);
-        System.out.println("Frame Initialized. Making Visible");
         setVisible(true);
-        System.out.println("Frame Visible");
-        System.out.println();
-        System.out.println("Initializing Files");
+        System.out.println("Frame Initialized.");
         System.out.println();
         System.out.println();
         lines = choices.discernFate("Start Over");
@@ -60,7 +57,7 @@ public class Frame extends JFrame {
     public class Panel extends JPanel {
         public Panel(){
             System.out.println("Initializing Main Panel");
-            title = new JLabel("American Imperialism", JLabel.CENTER);
+            title = new JLabel("American Expansionism", JLabel.CENTER);
             quit = new JLabel("Quit", JLabel.CENTER);
             setBackground(BACKGROUND);
             setLayout(new BorderLayout());
@@ -83,8 +80,6 @@ public class Frame extends JFrame {
             if (e.getSource() == quit){
                 System.exit(0);
             }else if (e.getSource() instanceof JLabel){
-                System.out.println(((JLabel) e.getSource()).getText());
-
                 if (e.getSource() == start){
                     lines = choices.discernFate("Start Over");
                 } else {
