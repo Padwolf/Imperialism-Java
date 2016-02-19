@@ -141,6 +141,10 @@ public class Choices extends JPanel{
                     rtn = new String[2];
                     rtn[0] = "death";
                     rtn[1] = "A crew member swung their pickaxe back a bit to far. Your head was in the way.";
+                } else if (rand(10) == 1){
+                    rtn = new String[2];
+                    rtn[0] = "death";
+                    rtn[1] = "You found out what killed all the demolitionists. It was big, green, and went \"SSSSSSSSSSSSSSSSSSSSSSSSS\" before it went \"BOOM\".";
                 } else {
                     rtn = new String[3];
                     rtn[0] = "You survived to the end of your contract. You now have two options in front of you:";
