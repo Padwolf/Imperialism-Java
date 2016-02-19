@@ -434,11 +434,11 @@ public class Choices extends JPanel{
                 if (rand(12) == 1){
                     rtn[1] = "You have been spotted. You have been shotted";
                 } else {
-                    rtn[1] = "In the heat of battle, you see a general in your sights. Ypu take the shot.";
+                    rtn[1] = "In the heat of battle, you see a general in your sights. You take the shot. ";
                     if (rand(4) == 1){
                         rtn[1] += "You go to confirm the kill. You realised that you shot your own general. Good job. You got yourself court-martialed";
                     } else {
-                        rtn[1] += "Great shot! That was one of Spain's best. Thanks to this and your other great feats help America to win the war.";
+                        rtn[1] += "Great shot! That was one of Spain's best. This and your other great feats help America to win the war.";
                     }
                 }
                 break;
@@ -446,7 +446,7 @@ public class Choices extends JPanel{
                 rtn = new String[2];
                 if (rand(12) == 1){
                     rtn[0] = "death";
-                    rtn[1] = "You have been spotted. You have been shotted";
+                    rtn[1] = "You have been spotted. You have been shotted.";
                 } else {
                     rtn[0] = "Due to your primitive technology, you get captured by the Spanish Army for questioning. No one expects the Spanish Inquisition.";
                     rtn[1] = "Wonderful. Just wonderful.";
