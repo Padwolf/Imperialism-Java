@@ -2,25 +2,20 @@ package com.padwolf.school.imperialism;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeListener;
-import java.io.*;
 
 /**
- * Created by 970098955 on 2/1/2016.
+ * American Imperialism crated by Patrick Duane and William Morlan for a school project.
  */
 public class Frame extends JFrame {
     final Panel panel;
-    static JLabel title, quit;
-    static Color BACKGROUND, TEXT_FOREGROUND, TEXT_SECONDARY;
+    static JLabel title, quit, start;
+    static Color BACKGROUND, TEXT_FOREGROUND, TEXT_SECONDARY, TEXT_BUTTONS;
     private static MouseListener mse;
     public  static Dimension screenSize;
-    public boolean buttonPressed;
-    PrintWriter ot;
-    BufferedReader in;
+    int choiceNum;
+    String[] lines;
 
     public Choices choices;
 
@@ -28,116 +23,38 @@ public class Frame extends JFrame {
         BACKGROUND = new Color (100, 100, 100);
         TEXT_SECONDARY = new Color(30, 30, 30);
         TEXT_FOREGROUND = new Color(0, 0, 0);
+        TEXT_BUTTONS = new Color(15, 15, 15);
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         new Frame();
-    }
-
-    private boolean fileUpdatedFrom(String original) throws IOException {
-        if (original == null) return true;
-        in = choices.resetBuffer(in, choices.choices);
-        String message = in.readLine();
-        in.close();
-        return !message.equals(original);
     }
 
     public Frame(){
         System.out.println("Initializing Frame");
         mse = new Listen();
+        choiceNum = -1;
         choices = new Choices(this);
-        panel = new Panel();
         System.out.println("Screen Size: " + Integer.toString(screenSize.width)
                 + ", " + screenSize.height);
         setSize(getToolkit().getScreenSize());
         setUndecorated(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        start = new JLabel("Start", JLabel.CENTER);
+        start.setFont(start.getFont().deriveFont(screenSize.width/12f));
+        start.addMouseListener(mse);
+        choices.add(start, BorderLayout.CENTER);
+        choices.add(new JLabel("NOTE: Sometimes you have to click your option multiple times for it to respond.  If it doesn't work when you click it,  just keep clicking.", JLabel.CENTER), BorderLayout.SOUTH);
+
+        panel = new Panel();
         add(panel);
         System.out.println("Frame Initialized. Making Visible");
         setVisible(true);
         System.out.println("Frame Visible");
         System.out.println();
+        System.out.println("Initializing Files");
         System.out.println();
         System.out.println();
-        updateFrame();
-    }
-
-    void updateFrame(){
-        System.out.println("Entering Frame Checking");
-        buttonPressed = false;
-
-        String line, lastMessage = null;
-        JPanel choosePane = choices.choosePane;
-        JLabel[] buttons;
-        JLabel message;
-        int numOfChoices;
-
-        choosePane.setLayout(null);
-        try {
-            while (true) {
-                if (fileUpdatedFrom(lastMessage)) {
-                    buttonPressed = false;
-                    System.out.println("File has been updated");
-                    in = choices.resetBuffer(in, choices.choices);
-                    line = in.readLine();
-                    lastMessage = line;
-                    choices.removeAll();
-                    choices.revalidate();
-                    if (line.equals("EOG")){
-                        line = in.readLine();
-                        message = new JLabel(line, JLabel.CENTER);
-                        message.setForeground(TEXT_SECONDARY);
-                        message.setFont(message.getFont().deriveFont(screenSize.width/30f));
-                        JLabel endLabel = new JLabel("Game Over", JLabel.CENTER);
-                        endLabel.setForeground(Color.BLACK);
-                        endLabel.setFont(endLabel.getFont().deriveFont(screenSize.width/15.0f));
-                        choices.add(message, BorderLayout.NORTH);
-                        choices.add(endLabel, BorderLayout.CENTER);
-                        break;
-                    }
-                    message = new JLabel(line, JLabel.CENTER);
-                    message.setForeground(TEXT_SECONDARY);
-                    message.setFont(message.getFont().deriveFont(screenSize.width/30f));
-                    choices.add(message, BorderLayout.NORTH);
-                    numOfChoices = 0;
-                    in.close();
-                    in = choices.resetBuffer(in, choices.choices);
-                    in.readLine();
-                    while (in.readLine() != null) {
-                        numOfChoices++;
-                    }
-                    in.close();
-                    in = choices.resetBuffer(in, choices.choices);
-                    in.readLine();
-                    choosePane = choices.recreateChoosePane(numOfChoices);
-                    buttons = new JLabel[numOfChoices];
-                    for (int i = 0; i < numOfChoices; i++) {
-                        line = in.readLine();
-                        buttons[i] = new JLabel(line, JLabel.CENTER);
-                        buttons[i].setFont(buttons[i].getFont().deriveFont(screenSize.width/35f));
-                        buttons[i].addMouseListener(mse);
-                        System.out.println(buttons[i].getText());
-                        choosePane.add(buttons[i]);
-                    }
-                    in.close();
-                    choices.add(choosePane, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
-                    System.out.println("Sleeping");
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    //while (!buttonPressed) {
-                    //}
-                    System.out.println("Waking Up");
-                }
-
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        lines = choices.discernFate("Start Over");
     }
 
     public class Panel extends JPanel {
@@ -165,19 +82,51 @@ public class Frame extends JFrame {
         public void mouseClicked(MouseEvent e) {
             if (e.getSource() == quit){
                 System.exit(0);
-            } else if (e.getSource() instanceof JLabel){
-                try {
-                    ot = new PrintWriter(new BufferedWriter(new FileWriter(choices.choice)));
-                } catch (FileNotFoundException e2) {
-                    e2.printStackTrace();
-                } catch (IOException e2) {
-                    e2.printStackTrace();
-                }
+            }else if (e.getSource() instanceof JLabel){
                 System.out.println(((JLabel) e.getSource()).getText());
-                ot.println(((JLabel) e.getSource()).getText());
-                ot.flush();
-                ot.close();
-                buttonPressed = true;
+
+                if (e.getSource() == start){
+                    lines = choices.discernFate("Start Over");
+                } else {
+                    lines = choices.discernFate(((JLabel) e.getSource()).getText());
+                }
+
+                choices.removeAll();
+                choices.revalidate();
+
+                JLabel message;
+                if (lines[0].equals("death")){
+                    message = new JLabel("<html><p align=center>" + lines[1] + "</p></html>", JLabel.CENTER);
+                    message.setFont(message.getFont().deriveFont(screenSize.width/30f));
+                    message.setForeground(TEXT_SECONDARY);
+                    choices.add(message, BorderLayout.NORTH);
+                    JLabel go = new JLabel("Game Over", JLabel.CENTER);
+                    go.setFont(go.getFont().deriveFont(screenSize.width/15f));
+                    go.setForeground(Color.BLACK);
+                    go.addMouseListener(mse);
+                    choices.add(go);
+
+                } else {
+                    message = new JLabel("<html><p align=center>" + lines[0] + "</p></html>", JLabel.CENTER);
+                    message.setFont(message.getFont().deriveFont(screenSize.width/30f));
+                    message.setForeground(TEXT_SECONDARY);
+                    choices.add(message, BorderLayout.NORTH);
+
+                    JLabel[] buttons = new JLabel[lines.length - 1];
+                    JPanel choosePane = choices.recreateChoosePane(buttons.length);
+                    for (int i = 0; i < buttons.length; i++){
+                        buttons[i] = new JLabel(lines[i+1], JLabel.CENTER);
+                        buttons[i].setFont(buttons[i].getFont().deriveFont(screenSize.width/25f));
+                        buttons[i].setForeground(TEXT_BUTTONS);
+                        buttons[i].addMouseListener(mse);
+                        choosePane.add(buttons[i]);
+                    }
+
+                    choices.add(choosePane, BorderLayout.CENTER);
+                    choices.revalidate();
+                    choices.repaint();
+                }
+
 
             }
         }
@@ -186,6 +135,8 @@ public class Frame extends JFrame {
         public void mousePressed(MouseEvent e) {
             if (e.getSource() == quit){
                 quit.setForeground(TEXT_SECONDARY);
+            } else if (e.getSource() instanceof JLabel){
+                ((JLabel) e.getSource()).setForeground(Frame.TEXT_SECONDARY);
             }
         }
 
@@ -193,6 +144,8 @@ public class Frame extends JFrame {
         public void mouseReleased(MouseEvent e) {
             if (e.getSource() == quit){
                 quit.setForeground(TEXT_FOREGROUND);
+            } else if (e.getSource() instanceof JLabel){
+                ((JLabel) e.getSource()).setForeground(Frame.TEXT_FOREGROUND);
             }
         }
 
